@@ -17,7 +17,8 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
     private ArrayList<String> tasks;
-    private ArrayAdapter<String> tasksAdapter;
+    //private ArrayAdapter<String> tasksAdapter;
+    private CustomArrayAdapter tasksAdapter;
     private ListView tasksListView;
     private EditText taskToAdd;
     private int EDIT_REQUEST_CODE = 1;
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private void initializeTaskList() {
         tasks = new ArrayList<String>();
         readTasks();
-        tasksAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  tasks);
+        //tasksAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,  tasks);
+        tasksAdapter = new CustomArrayAdapter(this, tasks);
         tasksListView.setAdapter(tasksAdapter);
 
         // Long click on a task to Delete
