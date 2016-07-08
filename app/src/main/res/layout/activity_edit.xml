@@ -9,13 +9,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.nsundareswaran.todoapp.EditActivity">
 
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dpDate"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:spinnersShown="true"
+        android:datePickerMode="spinner"
+        android:calendarViewShown="false" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save_label"
         android:id="@+id/btnSaveItem"
         android:onClick="onSave"
-        android:layout_centerVertical="true"
+        android:layout_below="@id/dpDate"
         android:layout_centerHorizontal="true" />
 
     <EditText
@@ -23,8 +32,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/etEditItem2"
         android:textSize="32dp"
-        android:layout_above="@+id/btnSaveItem"
-        android:layout_marginBottom="40dp"
+        android:layout_above="@+id/dpDate"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -35,4 +43,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+
+
 </RelativeLayout>

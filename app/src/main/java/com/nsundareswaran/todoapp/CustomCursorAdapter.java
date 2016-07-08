@@ -25,19 +25,24 @@ public class CustomCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        String task = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME));
-        TextView textView = (TextView) view.findViewById(R.id.tvItemName);
-        textView.setText(task);
+        updateView(view, cursor);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
-
-        String task = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME));
-
-        TextView textView = (TextView) view.findViewById(R.id.tvItemName);
-        textView.setText(task);
+        updateView(view, cursor);
         return view;
+    }
+
+    private void updateView(View view, Cursor cursor) {
+        String task = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME));
+        String date = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_DATE));
+        date = Task.normalizeDate(date);
+
+        TextView tvItemName = (TextView) view.findViewById(R.id.tvItemName);
+        TextView tvItemDate = (TextView) view.findViewById(R.id.tvItemDate);
+        tvItemName.setText(task);
+        tvItemDate.setText(date);
     }
 }

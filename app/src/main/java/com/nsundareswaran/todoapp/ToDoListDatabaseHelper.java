@@ -20,6 +20,7 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
     public static final String COLUMN_ITEM_NAME = "TODO_ITEM_NAME";
     public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_DATE = "TODO_ITEM_DATE";
     public static final String DB_TABLE_NAME = "TODOS";
     private static ToDoListDatabaseHelper sInstance = null;
     private static SQLiteDatabase db = null;
@@ -31,7 +32,8 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String createTable = "CREATE TABLE "+DB_TABLE_NAME+" ("
                                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                                + COLUMN_ITEM_NAME + " TEXT);";
+                                + COLUMN_ITEM_NAME + " TEXT, "
+                                + COLUMN_DATE+ " DATE);";
         sqLiteDatabase.execSQL(createTable);
     }
 
@@ -57,20 +59,12 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             cursor = db.query(DB_TABLE_NAME,
-                    new String[] {COLUMN_ID, COLUMN_ITEM_NAME},
+                    new String[] {COLUMN_ID, COLUMN_ITEM_NAME, COLUMN_DATE},
                     null,
                     null,
                     null,
                     null,
-                    COLUMN_ITEM_NAME+" ASC");
-//            cursor.moveToFirst();
-//            if (cursor.moveToFirst()) {
-//                do {
-//                    String itemName = cursor.getString(cursor.getColumnIndex(COLUMN_ITEM_NAME));
-//                    tasks.add(itemName);
-//                } while (cursor.moveToNext());
-//            }
-
+                    COLUMN_DATE+" ASC");
         } catch (SQLiteException e) {
             System.out.println("Db initialization error");
         }
@@ -78,12 +72,13 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public void addDbEntry (String task) {
+    public void addDbEntry (Task task) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             db.beginTransaction();
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ITEM_NAME, task);
+            values.put(COLUMN_ITEM_NAME, task.name);
+            values.put(COLUMN_DATE, task.date);
             db.insertOrThrow(DB_TABLE_NAME, null, values);
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
@@ -100,7 +95,6 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
             db.beginTransaction();
             ContentValues values = new ContentValues();
             int i = db.delete(DB_TABLE_NAME, COLUMN_ID+ " = ? ", new String[] {Integer.toString(id)});
-//            System.out.println("i = "+i);
             if (i > 0) {
                 db.setTransactionSuccessful();
             }
@@ -114,12 +108,13 @@ public class ToDoListDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateEntry (String oldTask, String newTask) {
+    public void updateEntry (Task oldTask, Task newTask) {
         try {
             db.beginTransaction();
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ITEM_NAME, newTask);
-            db.update(DB_TABLE_NAME, values, COLUMN_ITEM_NAME+ " = ? ", new String[] {oldTask});
+            values.put(COLUMN_ITEM_NAME, newTask.name);
+            values.put(COLUMN_DATE, newTask.date);
+            db.update(DB_TABLE_NAME, values, COLUMN_ITEM_NAME+ " = ? ", new String[] {oldTask.name});
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {
             System.out.println("Db update error");

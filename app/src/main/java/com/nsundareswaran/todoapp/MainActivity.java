@@ -20,18 +20,15 @@ import org.apache.commons.io.FileUtils;
 
 import java.util.ArrayList;
 import java.io.File;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-    //private ArrayList<String> tasks;
-    //private ArrayAdapter<String> tasksAdapter;
     private CustomCursorAdapter tasksAdapter;
     private ListView tasksListView;
     private EditText taskToAdd;
     private int EDIT_REQUEST_CODE = 1;
     private int RESULT_OK = 200;
     private String LOG_TAG = "MainActivity";
-    private String EDIT_ENTRY_TAG = "edit_entry";
-    private String EDIT_ENTRY_INDEX_TAG = "index";
     private static ToDoListDatabaseHelper toDoListDatabaseHelper;
     private Cursor cursor = null;
     SQLiteDatabase db = null;
@@ -80,16 +77,21 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 cursor.moveToPosition(i);
                 String editEntry =  cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME));
+                String editDate = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_DATE));
                 Intent intent = new Intent(MainActivity.this, EditActivity.class);
-                intent.putExtra(EDIT_ENTRY_TAG, editEntry);
-                intent.putExtra(EDIT_ENTRY_INDEX_TAG,i);
+                Bundle bundle = new Bundle();
+                bundle.putString(EditActivity.EDIT_ENTRY_TAG, editEntry);
+                bundle.putString(EditActivity.EDIT_DATE_TAG, editDate);
+                bundle.putInt(EditActivity.EDIT_ENTRY_INDEX_TAG, i);
+                intent.putExtras(bundle);
                 startActivityForResult(intent, EDIT_REQUEST_CODE);
             }
         });
     }
 
     public void onAdd(View view) {
-        String newTask = taskToAdd.getText().toString();
+        String taskName = taskToAdd.getText().toString();
+        Task newTask = new Task(taskName);
         taskToAdd.setText("");
         toDoListDatabaseHelper.addDbEntry(newTask);
         updateAdapter();
@@ -98,12 +100,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == EDIT_REQUEST_CODE && resultCode == RESULT_OK) {
-            String edittedItem = data.getExtras().getString(EDIT_ENTRY_TAG);
-            int index = data.getExtras().getInt(EDIT_ENTRY_INDEX_TAG);
-            System.out.println("edittedItem "+ edittedItem+" index "+ index);
+            Bundle bundle = data.getExtras();
+            Task newTask = new Task(
+                    bundle.getString(EditActivity.EDIT_ENTRY_TAG),
+                    bundle.getString(EditActivity.EDIT_DATE_TAG)
+            );
+            int index = bundle.getInt(EditActivity.EDIT_ENTRY_INDEX_TAG);
             cursor.moveToPosition(index);
-            String oldEntry = cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME));
-            toDoListDatabaseHelper.updateEntry(oldEntry, edittedItem);
+            Task oldTask = new Task(
+                    cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_ITEM_NAME)),
+                    cursor.getString(cursor.getColumnIndex(ToDoListDatabaseHelper.COLUMN_DATE))
+            );
+            toDoListDatabaseHelper.updateEntry(oldTask, newTask);
             updateAdapter();
         }
     }
